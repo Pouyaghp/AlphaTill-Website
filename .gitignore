@@ -1,0 +1,16 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Node (only if you later add a build step)
+node_modules/
+npm-debug.log*
+
+# Local host build output
+dist/
+.netlify/
+.cloudflare/

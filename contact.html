@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Book a demo — AlphaTill</title>
+<meta name="description" content="Book a private AlphaTill demo or request a callback. We'll set it up with your menu." />
+<link rel="icon" href="img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a href="index.html" class="logo"><img src="img/logo.png" alt="AlphaTill" /></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="features.html">Features</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="about.html">About</a>
+      <a href="contact.html" class="nav-cta active">Book a demo</a>
+    </nav>
+    <button class="menu-toggle" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<section class="hero" style="padding-bottom:20px;">
+  <div class="wrap">
+    <span class="eyebrow">Book a demo</span>
+    <h1>Let's get your till <span class="gold-text">sorted.</span></h1>
+    <p class="lead">Tell us a little about your shop and we'll arrange a private walkthrough — set up with your menu and order types.</p>
+  </div>
+</section>
+
+<section style="padding-top:10px;">
+  <div class="wrap">
+    <div class="form-wrap">
+
+      <form id="demo-form" class="card" style="padding:40px;">
+        <div class="form-grid">
+          <div class="field">
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" required placeholder="Jane Smith" />
+          </div>
+          <div class="field">
+            <label for="shop">Shop name</label>
+            <input id="shop" name="shop" type="text" placeholder="Golden Grill" />
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" required placeholder="you@email.com" />
+          </div>
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" placeholder="07…" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="interest">I'm most interested in</label>
+          <select id="interest" name="interest">
+            <option>A full demo of AlphaTill</option>
+            <option>Pricing & which plan suits me</option>
+            <option>AI phone ordering</option>
+            <option>Moving from my current till</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message">Anything we should know?</label>
+          <textarea id="message" name="message" placeholder="How many tills, which order channels you use, etc."></textarea>
+        </div>
+        <button type="submit" class="btn btn-gold" style="width:100%;">Request my demo</button>
+        <p class="form-note">We'll never share your details. We'll get back to you within one working day.</p>
+      </form>
+
+      <div id="form-ok" class="card reveal in" style="display:none; text-align:center; padding:54px 40px;">
+        <div style="font-size:46px; margin-bottom:14px;" class="gold-text">✓</div>
+        <h2 style="font-size:34px; margin-bottom:12px;">Thank you.</h2>
+        <p style="color:var(--text-soft);">Your request is in. We'll be in touch within one working day to arrange your walkthrough.</p>
+        <div style="margin-top:26px;"><a href="index.html" class="btn btn-ghost">Back to home</a></div>
+      </div>
+
+    </div>
+
+    <div class="wrap contact-info">
+      <div class="ci"><h4>Email</h4><p>hello@alphatill.store</p></div>
+      <div class="ci"><h4>Sales</h4><p>sales@alphatill.store</p></div>
+      <div class="ci"><h4>Online</h4><p>alphatill.store</p></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand"><img src="img/logo.png" alt="AlphaTill" /><p>A refined point-of-sale system for takeaways. Built to be fast at the counter and effortless in the back office.</p></div>
+      <div class="foot-col"><h5>Product</h5><a href="features.html">Features</a><a href="pricing.html">Pricing</a><a href="contact.html">Book a demo</a></div>
+      <div class="foot-col"><h5>Company</h5><a href="about.html">About</a><a href="contact.html">Contact</a></div>
+      <div class="foot-col"><h5>Get in touch</h5><a href="mailto:hello@alphatill.store">hello@alphatill.store</a><a href="contact.html">Request a callback</a></div>
+    </div>
+    <div class="foot-bottom"><span>© 2026 AlphaTill. All rights reserved.</span><span>alphatill.store</span></div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
