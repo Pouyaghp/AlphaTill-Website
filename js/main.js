@@ -31,10 +31,10 @@ if (brand && !reduce) {
     p = Math.min(1, Math.max(0, p));
     const e = easeOutCubic(p);
 
-    // Logo: large & blurred -> settled & sharp
-    const scale = 1.35 - 0.35 * e;
-    const blur  = (1 - e) * 14;
-    const op    = Math.min(1, p * 2.2);
+    // Logo: visible from the top, gently settles & sharpens
+    const scale = 1.12 - 0.12 * e;
+    const blur  = (1 - e) * 2;
+    const op    = Math.min(1, 0.85 + e);
     wrap.style.transform = 'scale(' + scale.toFixed(3) + ')';
     wrap.style.filter    = 'blur(' + blur.toFixed(2) + 'px)';
     wrap.style.opacity   = op.toFixed(3);

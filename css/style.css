@@ -359,7 +359,7 @@ footer.site {
 }
 
 /* ---------- Scroll-driven brand reveal ---------- */
-.brand-reveal { height: 180vh; position: relative; z-index: 1; }
+.brand-reveal { height: 160vh; position: relative; z-index: 1; }
 .brand-sticky {
   position: sticky; top: 0; height: 100vh;
   display: flex; flex-direction: column;
@@ -377,9 +377,9 @@ footer.site {
 .brand-logo-wrap {
   position: relative;
   will-change: transform, filter, opacity;
-  transform: scale(1.35);
-  filter: blur(14px);
-  opacity: 0;
+  transform: scale(1.12);
+  filter: blur(2px);
+  opacity: 1;
 }
 .brand-logo { width: min(700px, 88vw); display: block; }
 .brand-shine {
