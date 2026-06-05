@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Live Demo — AlphaTill</title>
+<meta name="description" content="Step behind the counter. A working sandbox of AlphaTill — take an order, take payment, and watch the receipt, kitchen ticket and kitchen screen react live." />
+<link rel="icon" href="img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+/* ===================== DEMO STAGE ===================== */
+.demo-hero { padding: 70px 0 24px; text-align: center; }
+.demo-hero h1 { font-size: clamp(40px, 6vw, 70px); margin-bottom: 18px; }
+.demo-hero .lead { font-size: 19px; color: var(--text-soft); max-width: 660px; margin: 0 auto; }
+
+.demo-wrap { max-width: 1280px; margin: 0 auto; padding: 0 22px; position: relative; z-index: 1; }
+
+.demo-toolbar {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center;
+  background: var(--bg-card); border: 1px solid var(--line-soft); border-radius: 14px;
+  padding: 16px; margin-bottom: 14px;
+}
+.demo-toolbar .tb-label { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); margin-right: 4px; }
+.tb-btn {
+  font-family: var(--sans); font-size: 13.5px; font-weight: 600; cursor: pointer;
+  background: var(--bg-elev); color: var(--text); border: 1px solid var(--line-soft);
+  border-radius: 999px; padding: 9px 18px; transition: all .2s ease;
+}
+.tb-btn:hover { border-color: var(--gold); color: var(--gold-lite); }
+.tb-btn.gold { background: var(--gold-grad); color: #14110a; border-color: transparent; }
+.role-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.role-switch button { background: transparent; border: 0; color: var(--text-soft); padding: 9px 16px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.role-switch button.on { background: var(--gold-grad); color: #14110a; }
+
+.demo-hint { text-align: center; color: var(--text-dim); font-size: 13.5px; margin-bottom: 22px; }
+
+.demo-grid { display: grid; grid-template-columns: 1.45fr 1fr; gap: 26px; align-items: start; }
+.device-label {
+  font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold);
+  text-align: center; margin-bottom: 12px; font-weight: 600;
+}
+
+/* ---- Monitor (bezel) ---- */
+.monitor {
+  border-radius: 18px; border: 1px solid var(--line);
+  background: linear-gradient(180deg, #18181d, #0b0b0e);
+  padding: 14px; box-shadow: var(--shadow); position: relative;
+}
+.monitor::after {
+  content: ""; display: block; width: 120px; height: 16px; margin: 12px auto -2px;
+  background: linear-gradient(180deg, #1a1a1f, #0c0c0f); border: 1px solid var(--line-soft);
+  border-radius: 0 0 8px 8px;
+}
+.screen { background: #101216; border: 1px solid var(--line-soft); border-radius: 11px; overflow: hidden; }
+
+/* ---- Till (main monitor) ---- */
+.till-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 1px solid var(--line-soft); background: #0d0f12;
+}
+.till-top .brand { display: flex; align-items: center; gap: 10px; }
+.till-top img { height: 22px; }
+.till-top .open-pill { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #6ee7a0; border: 1px solid rgba(110,231,160,.4); border-radius: 999px; padding: 3px 9px; }
+.till-top .staff { font-size: 12.5px; color: var(--text-soft); }
+
+.till-body { display: grid; grid-template-columns: 1fr 320px; min-height: 430px; }
+.menu-side { padding: 12px; border-right: 1px solid var(--line-soft); }
+.cats { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 10px; }
+.cats button {
+  white-space: nowrap; background: var(--bg-elev); border: 1px solid var(--line-soft);
+  color: var(--text-soft); border-radius: 9px; padding: 8px 13px; font-size: 13px; cursor: pointer; font-weight: 600;
+}
+.cats button.on { background: var(--gold-grad); color: #14110a; border-color: transparent; }
+.items { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; margin-top: 10px; }
+.items button {
+  text-align: left; background: #15171c; border: 1px solid var(--line-soft); border-radius: 10px;
+  padding: 12px; cursor: pointer; color: var(--text); transition: all .15s ease;
+}
+.items button:hover { border-color: var(--gold); transform: translateY(-2px); }
+.items button .nm { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 5px; }
+.items button .pr { font-size: 13px; color: var(--gold-lite); font-family: var(--serif); }
+
+.order-side { display: flex; flex-direction: column; background: #0c0e11; }
+.order-lines { flex: 1; padding: 12px; overflow-y: auto; max-height: 230px; }
+.order-lines .empty { color: var(--text-dim); font-size: 13px; text-align: center; padding: 30px 0; }
+.oline { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line-soft); }
+.oline .l { display: flex; align-items: center; gap: 9px; }
+.oline .qty { background: var(--bg-elev); border: 1px solid var(--line); color: var(--gold-lite); border-radius: 6px; min-width: 24px; text-align: center; font-size: 12.5px; padding: 2px 4px; }
+.oline .nm2 { font-size: 13px; }
+.oline .lp { font-size: 13px; color: var(--text-soft); font-family: var(--serif); }
+.oline .rm { background: none; border: 0; color: var(--text-dim); cursor: pointer; font-size: 15px; margin-left: 6px; }
+.oline .rm:hover { color: #e88; }
+
+.order-totals { padding: 12px 14px; border-top: 1px solid var(--line-soft); font-size: 13.5px; color: var(--text-soft); }
+.order-totals > div { display: flex; justify-content: space-between; padding: 4px 0; }
+.order-totals .grand { font-family: var(--serif); font-size: 22px; color: var(--text); padding-top: 8px; }
+.order-totals .grand span { color: var(--gold-lite); }
+
+.types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0 12px 10px; }
+.types button { font-size: 11.5px; padding: 7px 4px; border-radius: 8px; border: 1px solid var(--line-soft); background: var(--bg-elev); color: var(--text-soft); cursor: pointer; font-weight: 600; }
+.types button.on { background: rgba(212,175,55,.14); border-color: var(--gold); color: var(--gold-lite); }
+
+.pay-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px 10px; }
+.pay { padding: 14px; border-radius: 10px; border: 0; cursor: pointer; font-weight: 700; font-size: 15px; font-family: var(--sans); }
+.pay.cash { background: #1f2a20; color: #8ee6a8; border: 1px solid rgba(110,231,160,.35); }
+.pay.card { background: var(--gold-grad); color: #14110a; }
+.pay:disabled { opacity: .45; cursor: not-allowed; }
+
+.admin-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; padding: 0 12px 14px; }
+.admin-row button { font-size: 11.5px; padding: 8px 4px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--text-soft); cursor: pointer; font-weight: 600; }
+.admin-row button:hover { border-color: var(--gold); color: var(--gold-lite); }
+.admin-row.hidden { display: none; }
+
+/* ---- Kitchen monitor ---- */
+.kitchen-monitor .screen { background: #0a0f0c; }
+.kds-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid rgba(110,231,160,.18); background: #0b120d; }
+.kds-top .t { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #8ee6a8; font-weight: 700; }
+.kds-top .c { font-size: 12px; color: var(--text-soft); }
+.kds-body { padding: 12px; min-height: 430px; max-height: 560px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.kds-empty { color: var(--text-dim); font-size: 13px; text-align: center; padding: 50px 0; }
+.ticket { border: 1px solid rgba(110,231,160,.25); border-radius: 10px; background: #0e1611; overflow: hidden; animation: ticketIn .35s ease; }
+@keyframes ticketIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.ticket .th { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; background: #102016; border-bottom: 1px dashed rgba(110,231,160,.25); }
+.ticket .th .no { font-weight: 700; color: #8ee6a8; font-size: 13.5px; }
+.ticket .th .badge { font-size: 10.5px; letter-spacing: .5px; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; color: var(--text-soft); }
+.ticket .th .tm { font-size: 11px; color: var(--text-dim); }
+.ticket .tl { padding: 10px 12px; }
+.ticket .tl div { font-size: 13px; color: var(--text); padding: 3px 0; }
+.ticket .tl .q { color: var(--gold-lite); font-weight: 700; margin-right: 6px; }
+.ticket .bump { width: 100%; border: 0; background: #16241a; color: #8ee6a8; padding: 9px; cursor: pointer; font-weight: 700; font-size: 12.5px; border-top: 1px solid rgba(110,231,160,.2); }
+.ticket .bump:hover { background: #1c3023; }
+.ticket.ready { opacity: .6; border-color: var(--line-soft); }
+.ticket.ready .bump { background: #14110a; color: var(--gold-lite); }
+
+/* ---- Peripherals ---- */
+.peripherals { display: flex; gap: 16px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
+
+.device { display: flex; flex-direction: column; align-items: center; }
+.device .dlabel { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); margin-top: 8px; }
+
+/* printer */
+.printer { width: 180px; }
+.printer-body {
+  height: 70px; border-radius: 12px 12px 6px 6px; border: 1px solid var(--line);
+  background: linear-gradient(180deg, #1c1c21, #101013); position: relative; box-shadow: var(--shadow);
+  display: flex; align-items: flex-start; justify-content: center;
+}
+.printer-body .pname { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-top: 9px; }
+.printer-slot { position: absolute; bottom: 6px; left: 14px; right: 14px; height: 5px; border-radius: 4px; background: #000; border: 1px solid var(--line-soft); }
+.printer-led { position: absolute; top: 9px; right: 12px; width: 7px; height: 7px; border-radius: 50%; background: #6ee7a0; box-shadow: 0 0 8px #6ee7a0; }
+.paper-tray { width: 158px; margin: 0 auto; overflow: hidden; }
+.paper {
+  background: #f6f3ea; color: #1a1a1a; font-family: ui-monospace, "Courier New", monospace; font-size: 10px; line-height: 1.5;
+  padding: 0 12px; border-radius: 0 0 4px 4px;
+  max-height: 0; opacity: 0; transform: translateY(-12px);
+  transition: max-height .8s ease, opacity .4s ease, transform .5s ease;
+  box-shadow: 0 10px 24px rgba(0,0,0,.5);
+}
+.paper.out { max-height: 420px; opacity: 1; transform: translateY(0); padding: 12px; }
+.paper .ct { text-align: center; }
+.paper .b { font-weight: 700; }
+.paper hr { border: 0; border-top: 1px dashed #999; margin: 6px 0; }
+.paper .rowp { display: flex; justify-content: space-between; }
+
+/* card machine */
+.cardmachine { width: 132px; border-radius: 14px; border: 1px solid var(--line); background: linear-gradient(180deg, #1c1c21, #0d0d10); padding: 12px; box-shadow: var(--shadow); }
+.cm-screen { background: #0a1f12; color: #8ee6a8; border: 1px solid rgba(110,231,160,.3); border-radius: 7px; height: 54px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; font-weight: 700; padding: 4px; }
+.cm-screen.amount { color: var(--gold-lite); }
+.cm-screen.ok { background: #0c2a17; color: #7dffb0; }
+.cm-keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 10px 0; }
+.cm-keys span { height: 16px; border-radius: 4px; background: #16161b; border: 1px solid var(--line-soft); }
+.cm-slot { height: 6px; background: #000; border: 1px solid var(--line-soft); border-radius: 4px; }
+.cm-card { height: 5px; margin: 6px auto 0; width: 70%; border-radius: 3px; background: var(--gold-grad); opacity: 0; transition: opacity .3s, transform .5s; transform: translateY(8px); }
+.cm-card.in { opacity: 1; transform: translateY(0); }
+
+/* ---- Telegram feed ---- */
+.tg-feed { position: fixed; right: 18px; bottom: 18px; width: 320px; max-width: calc(100vw - 36px); z-index: 60; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.tg-msg { background: #17212b; border: 1px solid #24323f; border-left: 3px solid var(--gold); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #e6edf3; box-shadow: var(--shadow); animation: tgIn .3s ease; }
+.tg-msg .tg-h { display: flex; justify-content: space-between; font-size: 10.5px; color: #8aa0b3; margin-bottom: 3px; }
+.tg-msg .tg-h b { color: #54a9ff; font-weight: 600; }
+@keyframes tgIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+.tg-toggle { position: fixed; right: 18px; bottom: 18px; z-index: 61; background: var(--gold-grad); color: #14110a; border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700; cursor: pointer; font-size: 12.5px; display: none; }
+
+/* ---- Overlays ---- */
+.overlay { position: fixed; inset: 0; background: rgba(5,5,7,.75); backdrop-filter: blur(4px); z-index: 70; display: none; align-items: center; justify-content: center; padding: 20px; }
+.overlay.show { display: flex; }
+.sheet { width: 100%; max-width: 440px; background: var(--bg-card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; max-height: 88vh; display: flex; flex-direction: column; }
+.sheet-head { padding: 18px 22px; border-bottom: 1px solid var(--line-soft); display: flex; justify-content: space-between; align-items: center; }
+.sheet-head h3 { font-size: 24px; }
+.sheet-head .x { background: none; border: 0; color: var(--text-soft); font-size: 22px; cursor: pointer; }
+.sheet-body { padding: 22px; overflow-y: auto; }
+.sheet-body .due { text-align: center; margin-bottom: 18px; }
+.sheet-body .due .lbl { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); }
+.sheet-body .due .amt { font-family: var(--serif); font-size: 48px; color: var(--gold-lite); }
+.tender { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+.tender button { padding: 14px 4px; border-radius: 10px; border: 1px solid var(--line-soft); background: var(--bg-elev); color: var(--text); cursor: pointer; font-weight: 700; }
+.tender button:hover { border-color: var(--gold); }
+.change-box { text-align: center; padding: 14px; border: 1px dashed var(--line); border-radius: 10px; margin-bottom: 16px; color: var(--text-soft); }
+.change-box b { color: #8ee6a8; font-size: 22px; font-family: var(--serif); display: block; }
+
+.report-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line-soft); font-size: 14.5px; color: var(--text-soft); }
+.report-row b { color: var(--text); }
+.report-h { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin: 18px 0 8px; }
+.report-big { display: flex; justify-content: space-between; font-family: var(--serif); font-size: 26px; padding: 10px 0; }
+.report-big span:last-child { color: var(--gold-lite); }
+
+@media (max-width: 1024px) {
+  .demo-grid { grid-template-columns: 1fr; }
+  .till-body { grid-template-columns: 1fr; }
+  .order-side { border-top: 1px solid var(--line-soft); }
+  .menu-side { border-right: 0; }
+}
+@media (max-width: 640px) {
+  .items { grid-template-columns: 1fr 1fr; }
+  .tg-feed { display: none; }
+  .tg-feed.open { display: flex; }
+  .tg-toggle { display: block; }
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a href="index.html" class="logo"><img src="img/logo.png" alt="AlphaTill" /></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="features.html">Features</a>
+      <a href="demo.html" class="active">Live Demo</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="about.html">About</a>
+      <a href="contact.html" class="nav-cta">Book a demo</a>
+    </nav>
+    <button class="menu-toggle" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<section class="demo-hero">
+  <div class="wrap">
+    <span class="eyebrow">Live demo · nothing is charged</span>
+    <h1>Step behind the <span class="gold-text">counter.</span></h1>
+    <p class="lead">A working sandbox of AlphaTill. Tap items, choose an order type and take payment — and watch the receipt, the kitchen ticket and the kitchen screen react in real time.</p>
+  </div>
+</section>
+
+<section class="demo-stage-section" style="padding-top:10px;">
+  <div class="demo-wrap">
+
+    <div class="demo-toolbar">
+      <span class="tb-label">Role</span>
+      <div class="role-switch" id="roleSwitch">
+        <button data-role="manager" class="on">Manager</button>
+        <button data-role="staff">Staff</button>
+      </div>
+      <button class="tb-btn" id="btnAI">📞 Simulate AI phone order</button>
+      <button class="tb-btn" id="btnReset">↺ Reset demo</button>
+    </div>
+    <p class="demo-hint">Tip: add a few items, pick <b>Card</b> or <b>Cash</b>, and watch both printers, the card machine and the kitchen screen respond. Managers can run the X &amp; Z reports.</p>
+
+    <div class="demo-grid">
+
+      <!-- FRONT COUNTER -->
+      <div class="counter-col">
+        <div class="device-label">Front counter</div>
+        <div class="monitor main-monitor">
+          <div class="screen">
+            <div class="till-top">
+              <div class="brand"><img src="img/logo.png" alt="" /><span class="open-pill">● TILL OPEN</span></div>
+              <span class="staff" id="staffLabel">Sam · Manager</span>
+            </div>
+            <div class="till-body">
+              <div class="menu-side">
+                <div class="cats" id="cats"></div>
+                <div class="items" id="items"></div>
+              </div>
+              <div class="order-side">
+                <div class="order-lines" id="orderLines"><div class="empty">No items yet — tap the menu</div></div>
+                <div class="order-totals">
+                  <div>Net <span id="netTotal">£0.00</span></div>
+                  <div>VAT (incl. 20%) <span id="vatTotal">£0.00</span></div>
+                  <div class="grand">Total <span id="grandTotal">£0.00</span></div>
+                </div>
+                <div class="types" id="types"></div>
+                <div class="pay-row">
+                  <button class="pay cash" id="payCash">Cash</button>
+                  <button class="pay card" id="payCard">Card</button>
+                </div>
+                <div class="admin-row" id="adminRow">
+                  <button id="btnX">X Report</button>
+                  <button id="btnZ">Z Report</button>
+                  <button id="btnRefund">Refund last</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="peripherals">
+          <div class="device">
+            <div class="printer">
+              <div class="printer-body"><span class="pname">Receipt</span><span class="printer-led"></span><span class="printer-slot"></span></div>
+              <div class="paper-tray"><div class="paper" id="receiptPaper"></div></div>
+            </div>
+            <span class="dlabel">Receipt printer</span>
+          </div>
+          <div class="device">
+            <div class="cardmachine">
+              <div class="cm-screen" id="cmScreen">READY</div>
+              <div class="cm-keys"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="cm-slot"></div>
+              <div class="cm-card" id="cmCard"></div>
+            </div>
+            <span class="dlabel">Card machine</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KITCHEN -->
+      <div class="kitchen-col">
+        <div class="device-label">Kitchen</div>
+        <div class="monitor kitchen-monitor">
+          <div class="screen">
+            <div class="kds-top"><span class="t">Kitchen Display</span><span class="c" id="kdsCount">0 active</span></div>
+            <div class="kds-body" id="kdsBody"><div class="kds-empty">Waiting for orders…</div></div>
+          </div>
+        </div>
+        <div class="peripherals">
+          <div class="device">
+            <div class="printer">
+              <div class="printer-body"><span class="pname">Kitchen</span><span class="printer-led"></span><span class="printer-slot"></span></div>
+              <div class="paper-tray"><div class="paper" id="kitchenPaper"></div></div>
+            </div>
+            <span class="dlabel">Kitchen printer</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-band reveal in">
+      <h2>Like what you see?</h2>
+      <p>Book a private walkthrough and we'll set AlphaTill up with your real menu.</p>
+      <a href="contact.html" class="btn btn-gold">Book a demo</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand"><img src="img/logo.png" alt="AlphaTill" /><p>A refined point-of-sale system for takeaways. Built to be fast at the counter and effortless in the back office.</p></div>
+      <div class="foot-col"><h5>Product</h5><a href="features.html">Features</a><a href="demo.html">Live Demo</a><a href="pricing.html">Pricing</a></div>
+      <div class="foot-col"><h5>Company</h5><a href="about.html">About</a><a href="contact.html">Contact</a></div>
+      <div class="foot-col"><h5>Get in touch</h5><a href="mailto:hello@alphatill.store">hello@alphatill.store</a><a href="contact.html">Request a callback</a></div>
+    </div>
+    <div class="foot-bottom"><span>© 2026 AlphaTill. All rights reserved.</span><span>alphatill.store</span></div>
+  </div>
+</footer>
+
+<!-- Telegram feed -->
+<div class="tg-feed" id="tgFeed"></div>
+<button class="tg-toggle" id="tgToggle">💬 Alerts</button>
+
+<!-- Cash overlay -->
+<div class="overlay" id="cashOverlay">
+  <div class="sheet">
+    <div class="sheet-head"><h3>Cash payment</h3><button class="x" data-close>×</button></div>
+    <div class="sheet-body">
+      <div class="due"><div class="lbl">Amount due</div><div class="amt" id="cashDue">£0.00</div></div>
+      <div class="tender" id="tenderBtns"></div>
+      <div class="change-box" id="changeBox" style="display:none;">Change due<b id="changeAmt">£0.00</b></div>
+      <button class="btn btn-gold" id="cashDone" style="width:100%; display:none;">Open drawer &amp; complete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Report overlay -->
+<div class="overlay" id="reportOverlay">
+  <div class="sheet">
+    <div class="sheet-head"><h3 id="reportTitle">X Report</h3><button class="x" data-close>×</button></div>
+    <div class="sheet-body" id="reportBody"></div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+/* ===================== ALPHATILL DEMO ENGINE ===================== */
+(function () {
+  const money = (n) => '£' + n.toFixed(2);
+  const VAT_RATE = 0.20;
+
+  const MENU = {
+    Pizza:    [['Margherita',8.50],['Pepperoni',10.00],['BBQ Chicken',11.50],['Veggie Supreme',10.50]],
+    Burgers:  [['Cheeseburger',6.50],['Double Bacon',8.50],['Chicken Burger',6.00],['Veggie Burger',6.00]],
+    Kebabs:   [['Doner Wrap',6.50],['Chicken Shish',8.00],['Mixed Grill',11.00],['Falafel Wrap',5.50]],
+    Sides:    [['Chips',2.50],['Cheesy Chips',3.50],['Onion Rings',3.00],['Garlic Bread',3.50]],
+    Drinks:   [['Cola',1.80],['Lemonade',1.80],['Water',1.20],['Orange Juice',2.00]],
+    Desserts: [['Cheesecake',3.50],['Brownie',3.00],['Ice Cream',2.50],['Baklava',3.50]],
+  };
+  const TYPES = ['Collection','Delivery','Deliveroo','Uber Eats','Just Eat'];
+
+  let order = [];
+  let curCat = 'Pizza';
+  let curType = 'Collection';
+  let orderNo = 41;
+  let role = 'manager';
+  const staff = 'Sam';
+  let lastSale = null;
+  let busy = false;
+  let totals = freshTotals();
+
+  function freshTotals() {
+    return { cash: 0, card: 0, vat: 0, count: 0, byType: {}, items: {} };
+  }
+
+  // ---------- element refs ----------
+  const $ = (id) => document.getElementById(id);
+  const elCats = $('cats'), elItems = $('items'), elLines = $('orderLines'),
+        elTypes = $('types'), elNet = $('netTotal'), elVat = $('vatTotal'), elGrand = $('grandTotal'),
+        elKds = $('kdsBody'), elKdsCount = $('kdsCount'), elTg = $('tgFeed'),
+        elStaff = $('staffLabel'), elAdmin = $('adminRow'),
+        receiptPaper = $('receiptPaper'), kitchenPaper = $('kitchenPaper'),
+        cmScreen = $('cmScreen'), cmCard = $('cmCard');
+
+  // ---------- render menu ----------
+  function renderCats() {
+    elCats.innerHTML = '';
+    Object.keys(MENU).forEach((c) => {
+      const b = document.createElement('button');
+      b.textContent = c; if (c === curCat) b.className = 'on';
+      b.onclick = () => { curCat = c; renderCats(); renderItems(); };
+      elCats.appendChild(b);
+    });
+  }
+  function renderItems() {
+    elItems.innerHTML = '';
+    MENU[curCat].forEach(([nm, pr]) => {
+      const b = document.createElement('button');
+      b.innerHTML = '<span class="nm">' + nm + '</span><span class="pr">' + money(pr) + '</span>';
+      b.onclick = () => addItem(nm, pr);
+      elItems.appendChild(b);
+    });
+  }
+  function renderTypes() {
+    elTypes.innerHTML = '';
+    TYPES.forEach((t) => {
+      const b = document.createElement('button');
+      b.textContent = t; if (t === curType) b.className = 'on';
+      b.onclick = () => { curType = t; renderTypes(); };
+      elTypes.appendChild(b);
+    });
+  }
+
+  // ---------- order ops ----------
+  function addItem(nm, pr) {
+    const ex = order.find((o) => o.name === nm);
+    if (ex) ex.qty++; else order.push({ name: nm, price: pr, qty: 1 });
+    renderOrder();
+  }
+  function changeQty(nm, d) {
+    const o = order.find((x) => x.name === nm); if (!o) return;
+    o.qty += d; if (o.qty <= 0) order = order.filter((x) => x.name !== nm);
+    renderOrder();
+  }
+  function orderTotal() { return order.reduce((s, o) => s + o.price * o.qty, 0); }
+
+  function renderOrder() {
+    if (!order.length) {
+      elLines.innerHTML = '<div class="empty">No items yet — tap the menu</div>';
+    } else {
+      elLines.innerHTML = '';
+      order.forEach((o) => {
+        const row = document.createElement('div'); row.className = 'oline';
+        row.innerHTML =
+          '<div class="l"><span class="qty">' + o.qty + '</span><span class="nm2">' + o.name + '</span></div>' +
+          '<div><span class="lp">' + money(o.price * o.qty) + '</span><button class="rm" title="remove">×</button></div>';
+        row.querySelector('.qty').onclick = () => changeQty(o.name, 1);
+        row.querySelector('.rm').onclick = () => changeQty(o.name, -o.qty);
+        row.querySelector('.nm2').onclick = () => changeQty(o.name, 1);
+        elLines.appendChild(row);
+      });
+    }
+    const total = orderTotal();
+    const vat = total * (VAT_RATE / (1 + VAT_RATE));
+    elNet.textContent = money(total - vat);
+    elVat.textContent = money(vat);
+    elGrand.textContent = money(total);
+    const has = order.length > 0 && !busy;
+    $('payCash').disabled = !has; $('payCard').disabled = !has;
+  }
+
+  // ---------- payment ----------
+  function payCardFlow() {
+    if (!order.length || busy) return;
+    busy = true; renderOrder();
+    const total = orderTotal();
+    setCard('amount', money(total)); cmCard.classList.add('in');
+    setTimeout(() => setCard('', 'READING CARD…'), 700);
+    setTimeout(() => setCard('', 'PROCESSING…'), 1500);
+    setTimeout(() => setCard('ok', 'APPROVED ✓'), 2300);
+    setTimeout(() => {
+      cmCard.classList.remove('in');
+      completeSale('Card');
+      setTimeout(() => setCard('', 'READY'), 1400);
+    }, 3100);
+  }
+  function setCard(cls, txt) { cmScreen.className = 'cm-screen' + (cls ? ' ' + cls : ''); cmScreen.textContent = txt; }
+
+  function openCash() {
+    if (!order.length || busy) return;
+    const total = orderTotal();
+    $('cashDue').textContent = money(total);
+    $('changeBox').style.display = 'none'; $('cashDone').style.display = 'none';
+    const tb = $('tenderBtns'); tb.innerHTML = '';
+    const opts = [];
+    [5,10,20,50].forEach((v) => { if (v >= total) opts.push(v); });
+    while (opts.length < 3) opts.push(Math.ceil((total + opts.length * 5) / 5) * 5);
+    const set = new Set(opts); set.add(Math.ceil(total));
+    const list = [...set].filter((v) => v >= total).sort((a,b)=>a-b).slice(0,3);
+    list.push('Exact');
+    list.forEach((v) => {
+      const b = document.createElement('button');
+      b.textContent = v === 'Exact' ? 'Exact' : money(v);
+      b.onclick = () => {
+        const tendered = v === 'Exact' ? total : v;
+        const change = tendered - total;
+        $('changeBox').style.display = 'block';
+        $('changeAmt').textContent = money(change);
+        $('cashDone').style.display = 'block';
+        $('cashDone').onclick = () => { closeOverlay('cashOverlay'); completeSale('Cash'); };
+      };
+      tb.appendChild(b);
+    });
+    showOverlay('cashOverlay');
+  }
+
+  function completeSale(method) {
+    const total = orderTotal();
+    const vat = total * (VAT_RATE / (1 + VAT_RATE));
+    const sale = {
+      no: orderNo, type: curType, method: method,
+      lines: order.map((o) => ({ name: o.name, price: o.price, qty: o.qty })),
+      total: total, vat: vat, time: now()
+    };
+    // record totals
+    if (method === 'Cash') totals.cash += total; else totals.card += total;
+    totals.vat += vat; totals.count++;
+    totals.byType[curType] = (totals.byType[curType] || 0) + total;
+    sale.lines.forEach((l) => { totals.items[l.name] = (totals.items[l.name] || 0) + l.qty; });
+
+    printReceipt(sale);
+    printKitchen(sale);
+    addTicket(sale);
+    tg('💳', 'Payment taken', method + ' · ' + money(total) + ' · ' + curType + '  (#' + sale.no + ')');
+
+    lastSale = sale;
+    orderNo++;
+    order = []; busy = false; renderOrder();
+  }
+
+  // ---------- printing ----------
+  function printReceipt(sale) {
+    let h = '<div class="ct b">ALPHATILL</div><div class="ct">Takeaway · POS</div><div class="ct">VAT Receipt</div><hr>';
+    h += '<div class="rowp"><span>Order #' + sale.no + '</span><span>' + sale.type + '</span></div>';
+    h += '<div class="rowp"><span>' + sale.time + '</span><span>' + sale.method + '</span></div><hr>';
+    sale.lines.forEach((l) => {
+      h += '<div class="rowp"><span>' + l.qty + '× ' + l.name + '</span><span>' + money(l.price * l.qty) + '</span></div>';
+    });
+    h += '<hr>';
+    h += '<div class="rowp"><span>Net</span><span>' + money(sale.total - sale.vat) + '</span></div>';
+    h += '<div class="rowp"><span>VAT 20%</span><span>' + money(sale.vat) + '</span></div>';
+    h += '<div class="rowp b"><span>TOTAL</span><span>' + money(sale.total) + '</span></div><hr>';
+    h += '<div class="ct">VAT Reg 123 4567 89</div><div class="ct">Thank you!</div>';
+    feedPaper(receiptPaper, h);
+  }
+  function printKitchen(sale) {
+    let h = '<div class="ct b">*** KITCHEN ***</div>';
+    h += '<div class="rowp b"><span>#' + sale.no + '</span><span>' + sale.type + '</span></div>';
+    h += '<div class="ct">' + sale.time + '</div><hr>';
+    sale.lines.forEach((l) => { h += '<div class="rowp b"><span>' + l.qty + '× ' + l.name + '</span><span></span></div>'; });
+    h += '<hr><div class="ct">— make it fresh —</div>';
+    feedPaper(kitchenPaper, h);
+  }
+  function feedPaper(el, html) {
+    el.classList.remove('out'); el.innerHTML = html;
+    void el.offsetWidth;            // reflow
+    requestAnimationFrame(() => el.classList.add('out'));
+  }
+
+  // ---------- kitchen display ----------
+  function addTicket(sale) {
+    const empty = elKds.querySelector('.kds-empty'); if (empty) empty.remove();
+    const t = document.createElement('div'); t.className = 'ticket';
+    let lines = ''; sale.lines.forEach((l) => { lines += '<div><span class="q">' + l.qty + '×</span>' + l.name + '</div>'; });
+    t.innerHTML =
+      '<div class="th"><span class="no">#' + sale.no + '</span><span class="badge">' + sale.type + '</span><span class="tm">' + sale.time + '</span></div>' +
+      '<div class="tl">' + lines + '</div>' +
+      '<button class="bump">✓ Tap when ready</button>';
+    const btn = t.querySelector('.bump');
+    btn.onclick = () => {
+      if (!t.classList.contains('ready')) { t.classList.add('ready'); btn.textContent = '✓ Ready — tap to clear'; updateKdsCount(); }
+      else { t.remove(); updateKdsCount(); if (!elKds.querySelector('.ticket')) elKds.innerHTML = '<div class="kds-empty">Waiting for orders…</div>'; }
+    };
+    elKds.prepend(t);
+    updateKdsCount();
+  }
+  function updateKdsCount() {
+    const active = elKds.querySelectorAll('.ticket:not(.ready)').length;
+    elKdsCount.textContent = active + ' active';
+  }
+
+  // ---------- refund ----------
+  function refundLast() {
+    if (!lastSale) { tg('ℹ️', 'Refund', 'No sale to refund yet'); return; }
+    const s = lastSale;
+    if (s.method === 'Cash') totals.cash -= s.total; else totals.card -= s.total;
+    totals.vat -= s.vat; totals.count--;
+    totals.byType[s.type] = (totals.byType[s.type] || 0) - s.total;
+    s.lines.forEach((l) => { totals.items[l.name] = (totals.items[l.name] || 0) - l.qty; });
+    tg('↩️', 'Refund issued', money(s.total) + ' · ' + s.method + ' · order #' + s.no);
+    lastSale = null;
+  }
+
+  // ---------- reports ----------
+  function moneyRows() {
+    const t = totals;
+    let h = '<div class="report-big"><span>Cash</span><span>' + money(t.cash) + '</span></div>';
+    h += '<div class="report-big"><span>Card</span><span>' + money(t.card) + '</span></div>';
+    h += '<div class="report-big"><span>Total</span><span>' + money(t.cash + t.card) + '</span></div>';
+    h += '<div class="report-row"><span>VAT collected</span><b>' + money(t.vat) + '</b></div>';
+    h += '<div class="report-row"><span>Orders</span><b>' + t.count + '</b></div>';
+    h += '<div class="report-h">Sales by order type</div>';
+    let any = false;
+    TYPES.forEach((ty) => { if (t.byType[ty]) { any = true; h += '<div class="report-row"><span>' + ty + '</span><b>' + money(t.byType[ty]) + '</b></div>'; } });
+    if (!any) h += '<div class="report-row"><span>No sales yet</span><b>—</b></div>';
+    h += '<div class="report-h">Items sold</div>';
+    const its = Object.keys(t.items).filter((k) => t.items[k] > 0);
+    if (its.length) its.forEach((k) => { h += '<div class="report-row"><span>' + k + '</span><b>' + t.items[k] + '</b></div>'; });
+    else h += '<div class="report-row"><span>No items yet</span><b>—</b></div>';
+    return h;
+  }
+  function openX() {
+    $('reportTitle').textContent = 'X Report · live totals';
+    $('reportBody').innerHTML = moneyRows() +
+      '<p class="demo-hint" style="margin-top:18px;">The X report is a running snapshot — it never resets the day.</p>';
+    showOverlay('reportOverlay');
+    tg('📊', 'X report viewed', 'by ' + staff + ' (Manager)');
+  }
+  function openZ() {
+    $('reportTitle').textContent = 'Z Report · close the day';
+    $('reportBody').innerHTML = moneyRows() +
+      '<div class="report-h">End of day</div>' +
+      '<div class="report-row"><span>💾 Daily record</span><b>saved (JSON + CSV)</b></div>' +
+      '<div class="report-row"><span>☁️ Cloud backup</span><b>synced</b></div>' +
+      '<button class="btn btn-gold" id="zConfirm" style="width:100%;margin-top:18px;">Close day &amp; reset</button>';
+    showOverlay('reportOverlay');
+    $('zConfirm').onclick = () => {
+      totals = freshTotals(); lastSale = null;
+      closeOverlay('reportOverlay');
+      tg('📊', 'Z report — day closed', 'Backup saved · totals reset · by ' + staff);
+    };
+  }
+
+  // ---------- AI phone order ----------
+  function aiOrder() {
+    if (busy) return;
+    const cats = Object.keys(MENU);
+    const picks = 1 + Math.floor(Math.random() * 3);
+    order = [];
+    for (let i = 0; i < picks; i++) {
+      const c = cats[Math.floor(Math.random() * cats.length)];
+      const [nm, pr] = MENU[c][Math.floor(Math.random() * MENU[c].length)];
+      addItem(nm, pr);
+    }
+    curType = 'Delivery'; renderTypes();
+    tg('📞', 'AI phone order (preview)', 'Order taken by voice — sending to till…');
+    setTimeout(() => completeSale('Card'), 600);
+  }
+
+  // ---------- telegram feed ----------
+  function tg(emoji, title, body) {
+    const m = document.createElement('div'); m.className = 'tg-msg';
+    m.innerHTML = '<div class="tg-h"><b>AlphaTill Bot</b><span>' + now() + '</span></div>' +
+                  emoji + ' <b>' + title + '</b><br><span style="color:#aebfcc">' + body + ' · ' + staff + '</span>';
+    elTg.prepend(m);
+    while (elTg.children.length > 6) elTg.removeChild(elTg.lastChild);
+  }
+
+  // ---------- role ----------
+  function setRole(r) {
+    role = r;
+    elStaff.textContent = staff + ' · ' + (r === 'manager' ? 'Manager' : 'Staff');
+    elAdmin.classList.toggle('hidden', r !== 'manager');
+    document.querySelectorAll('#roleSwitch button').forEach((b) => b.classList.toggle('on', b.dataset.role === r));
+  }
+
+  // ---------- overlays ----------
+  function showOverlay(id) { $(id).classList.add('show'); }
+  function closeOverlay(id) { $(id).classList.remove('show'); }
+  document.querySelectorAll('.overlay').forEach((ov) => {
+    ov.addEventListener('click', (e) => { if (e.target === ov || e.target.hasAttribute('data-close')) ov.classList.remove('show'); });
+  });
+
+  // ---------- helpers ----------
+  function now() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+
+  // ---------- reset ----------
+  function resetDemo() {
+    order = []; totals = freshTotals(); lastSale = null; busy = false; orderNo = 41;
+    curType = 'Collection'; curCat = 'Pizza';
+    receiptPaper.classList.remove('out'); kitchenPaper.classList.remove('out');
+    elKds.innerHTML = '<div class="kds-empty">Waiting for orders…</div>'; updateKdsCount();
+    elTg.innerHTML = '';
+    setCard('', 'READY');
+    renderCats(); renderItems(); renderTypes(); renderOrder();
+    tg('🔓', 'Till opened', 'Start of day');
+  }
+
+  // ---------- wire up ----------
+  $('payCard').onclick = payCardFlow;
+  $('payCash').onclick = openCash;
+  $('btnX').onclick = openX;
+  $('btnZ').onclick = openZ;
+  $('btnRefund').onclick = refundLast;
+  $('btnAI').onclick = aiOrder;
+  $('btnReset').onclick = resetDemo;
+  $('roleSwitch').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setRole(b.dataset.role); });
+  $('tgToggle').addEventListener('click', () => elTg.classList.toggle('open'));
+
+  // ---------- boot ----------
+  renderCats(); renderItems(); renderTypes(); renderOrder(); setRole('manager');
+  setTimeout(() => tg('🔓', 'Till opened', 'Start of day'), 400);
+})();
+</script>
+</body>
+</html>
