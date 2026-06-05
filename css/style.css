@@ -372,14 +372,14 @@ footer.site {
   background: radial-gradient(circle, rgba(212,175,55,0.16), transparent 62%);
   filter: blur(44px);
   pointer-events: none;
-  opacity: 0.9;
+  opacity: 0;
 }
 .brand-logo-wrap {
   position: relative;
   will-change: transform, filter, opacity;
-  transform: scale(1.12);
-  filter: blur(2px);
-  opacity: 1;
+  transform: scale(1.3);
+  filter: blur(16px);
+  opacity: 0;
 }
 .brand-logo { width: min(700px, 88vw); display: block; }
 .brand-shine {

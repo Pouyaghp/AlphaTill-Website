@@ -21,6 +21,7 @@ if (brand && !reduce) {
   const shine = brand.querySelector('.brand-shine');
   const tag   = brand.querySelector('.brand-tag');
   const cue   = brand.querySelector('.brand-scrollcue');
+  const glow  = brand.querySelector('.brand-glow');
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
   let ticking = false;
 
@@ -31,13 +32,14 @@ if (brand && !reduce) {
     p = Math.min(1, Math.max(0, p));
     const e = easeOutCubic(p);
 
-    // Logo: visible from the top, gently settles & sharpens
-    const scale = 1.12 - 0.12 * e;
-    const blur  = (1 - e) * 2;
-    const op    = Math.min(1, 0.85 + e);
+    // Logo: emerges from nothing -> sharpens & settles as you scroll
+    const scale = 1.3 - 0.3 * e;
+    const blur  = (1 - e) * 16;
+    const op    = Math.min(1, p * 2.4);
     wrap.style.transform = 'scale(' + scale.toFixed(3) + ')';
     wrap.style.filter    = 'blur(' + blur.toFixed(2) + 'px)';
     wrap.style.opacity   = op.toFixed(3);
+    if (glow) glow.style.opacity = Math.min(0.9, p * 1.8).toFixed(3);
 
     // Gold light sweep across the mark
     shine.style.opacity = (p > 0.04 && p < 0.96) ? '1' : '0';
