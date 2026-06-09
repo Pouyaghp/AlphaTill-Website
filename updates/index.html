@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Software Updates — AlphaTill</title>
+<meta name="description" content="Download the latest version of AlphaTill for Windows. Installed apps update automatically from this page." />
+<meta name="robots" content="noindex" />
+<link rel="icon" href="../img/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/style.css" />
+<style>
+.up-wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+.up-head { display: flex; align-items: center; justify-content: space-between; height: 78px; }
+.up-head img { height: 40px; }
+.up-head a.back { font-size: 14px; color: var(--text-soft); }
+.up-head a.back:hover { color: var(--gold-lite); }
+
+.up-hero { text-align: center; padding: 60px 0 26px; }
+.up-hero h1 { font-size: clamp(36px, 6vw, 58px); margin-bottom: 16px; }
+.up-hero p { color: var(--text-soft); font-size: 18px; max-width: 540px; margin: 0 auto; }
+
+.dl-card {
+  background: linear-gradient(170deg, #1a160d, #111117);
+  border: 1px solid var(--gold);
+  border-radius: 18px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(212,175,55,0.12);
+  margin: 10px 0 40px;
+}
+.dl-card .ver-eyebrow { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+.dl-card .ver { font-family: var(--serif); font-size: 54px; line-height: 1.1; margin: 6px 0 4px; }
+.dl-card .plat { color: var(--text-dim); font-size: 14px; margin-bottom: 28px; }
+.dl-card .btn { font-size: 16px; padding: 16px 40px; }
+.dl-card .meta { color: var(--text-dim); font-size: 12.5px; margin-top: 18px; }
+.dl-card .err { color: var(--text-soft); font-size: 15px; }
+
+.up-section { padding: 0 0 40px; }
+.up-section h2 { font-size: 28px; margin-bottom: 16px; }
+.up-section p { color: var(--text-soft); margin-bottom: 14px; }
+.up-note { background: var(--bg-card); border: 1px solid var(--line-soft); border-radius: 12px; padding: 22px 24px; color: var(--text-soft); font-size: 15px; }
+.up-note b { color: var(--text); }
+footer.up-foot { border-top: 1px solid var(--line-soft); padding: 30px 0; text-align: center; color: var(--text-dim); font-size: 13px; margin-top: 30px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="up-wrap up-head">
+    <a href="../index.html"><img src="../img/logo.png" alt="AlphaTill" /></a>
+    <a class="back" href="../index.html">← alphatill.store</a>
+  </div>
+</header>
+
+<div class="up-wrap">
+  <div class="up-hero">
+    <span class="eyebrow">Software updates</span>
+    <h1>AlphaTill for <span class="gold-text">Windows</span></h1>
+    <p>Already running AlphaTill? It updates itself automatically. Need a fresh install? Download the latest version below.</p>
+  </div>
+
+  <div class="dl-card" id="dlCard">
+    <div class="ver-eyebrow">Latest version</div>
+    <div class="ver gold-text" id="verNum">…</div>
+    <div class="plat" id="relDate">Checking for the newest release…</div>
+    <a class="btn btn-gold" id="dlBtn" href="#" style="display:none;">Download for Windows</a>
+    <div class="err" id="dlErr" style="display:none;">No release has been published yet. Check back soon.</div>
+    <div class="meta" id="dlMeta"></div>
+  </div>
+
+  <div class="up-section">
+    <h2>How updates work</h2>
+    <p>Every installed copy of AlphaTill checks this page on launch and from <b>Admin → Settings → Software updates → Check for updates</b>. When a newer version is found, the app downloads and installs it for you — no reinstall, no lost data.</p>
+    <div class="up-note">
+      <b>Tip:</b> You only need to download manually for a brand-new machine. Existing tills update themselves from here.
+    </div>
+  </div>
+</div>
+
+<footer class="up-foot">
+  © 2026 AlphaTill · alphatill.store
+</footer>
+
+<script>
+// Read electron-updater's latest.yml and present the newest build.
+(function () {
+  const verNum = document.getElementById('verNum');
+  const relDate = document.getElementById('relDate');
+  const dlBtn = document.getElementById('dlBtn');
+  const dlErr = document.getElementById('dlErr');
+  const dlMeta = document.getElementById('dlMeta');
+
+  function showNoRelease() {
+    verNum.textContent = '—';
+    relDate.textContent = '';
+    dlBtn.style.display = 'none';
+    dlErr.style.display = 'block';
+  }
+
+  fetch('latest.yml', { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('no feed'); return r.text(); })
+    .then(function (text) {
+      const ver = (text.match(/^version:\s*(.+)$/m) || [])[1];
+      // electron-updater lists the installer under files[].url (URL-encoded) and/or path:
+      let file = (text.match(/url:\s*(.+)/) || [])[1] || (text.match(/^path:\s*(.+)$/m) || [])[1];
+      const sizeM = (text.match(/size:\s*(\d+)/) || [])[1];
+      const dateM = (text.match(/releaseDate:\s*['"]?([^'"\n]+)/) || [])[1];
+      if (!ver || !file) return showNoRelease();
+
+      file = file.trim().replace(/^['"]|['"]$/g, '');
+      verNum.textContent = 'v' + ver.trim();
+      relDate.textContent = 'Windows installer (.exe)';
+      dlBtn.href = file;                 // relative to /updates/
+      dlBtn.setAttribute('download', '');
+      dlBtn.style.display = 'inline-block';
+      dlErr.style.display = 'none';
+
+      let meta = [];
+      if (sizeM) meta.push((sizeM / 1048576).toFixed(1) + ' MB');
+      if (dateM) { const d = new Date(dateM); if (!isNaN(d)) meta.push('Released ' + d.toLocaleDateString()); }
+      dlMeta.textContent = meta.join(' · ');
+    })
+    .catch(showNoRelease);
+})();
+</script>
+</body>
+</html>
