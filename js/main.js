@@ -13,46 +13,43 @@ const io = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
-// Scroll-scrubbed brand reveal (home page)
+// Scroll-scrubbed brand intro video (home page)
 const brand = document.getElementById('brandReveal');
+const introVideo = document.getElementById('introVideo');
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if (brand && !reduce) {
-  const wrap  = brand.querySelector('.brand-logo-wrap');
-  const shine = brand.querySelector('.brand-shine');
-  const tag   = brand.querySelector('.brand-tag');
-  const cue   = brand.querySelector('.brand-scrollcue');
-  const glow  = brand.querySelector('.brand-glow');
-  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-  let ticking = false;
+if (brand && introVideo && !reduce) {
+  const cue = brand.querySelector('.brand-scrollcue');
+  let dur = 0, ready = false, ticking = false, primed = false;
 
-  function update() {
+  function markReady() { dur = introVideo.duration || 0; if (dur) { ready = true; update(); } }
+  introVideo.addEventListener('loadedmetadata', markReady);
+  if (introVideo.readyState >= 1) markReady();
+
+  // iOS/Safari: prime a paused video so scrubbed frames actually render
+  function prime() {
+    if (primed) return; primed = true;
+    const pr = introVideo.play();
+    if (pr && pr.then) pr.then(function () { introVideo.pause(); }).catch(function () {});
+    else { try { introVideo.pause(); } catch (e) {} }
+  }
+  window.addEventListener('touchstart', prime, { passive: true, once: true });
+  window.addEventListener('scroll', prime, { passive: true, once: true });
+
+  function progress() {
     const rect = brand.getBoundingClientRect();
     const total = brand.offsetHeight - window.innerHeight;
     let p = total > 0 ? (-rect.top) / total : 0;
-    p = Math.min(1, Math.max(0, p));
-    const e = easeOutCubic(p);
-
-    // Logo: emerges from nothing -> sharpens & settles as you scroll
-    const scale = 1.3 - 0.3 * e;
-    const blur  = (1 - e) * 16;
-    const op    = Math.min(1, p * 2.4);
-    wrap.style.transform = 'scale(' + scale.toFixed(3) + ')';
-    wrap.style.filter    = 'blur(' + blur.toFixed(2) + 'px)';
-    wrap.style.opacity   = op.toFixed(3);
-    if (glow) glow.style.opacity = Math.min(0.9, p * 1.8).toFixed(3);
-
-    // Gold light sweep across the mark
-    shine.style.opacity = (p > 0.04 && p < 0.96) ? '1' : '0';
-    shine.style.backgroundPosition = (120 - p * 240).toFixed(1) + '% 0';
-
-    // Tagline fans in during the second half
-    const t2 = Math.min(1, Math.max(0, (p - 0.5) / 0.4));
-    tag.style.opacity = t2.toFixed(3);
-    tag.style.letterSpacing = (16 - t2 * 4).toFixed(1) + 'px';
-
-    // Fade the scroll cue as the animation plays
-    if (cue) cue.style.opacity = Math.max(0, 1 - p * 3).toFixed(2);
-
+    return Math.min(1, Math.max(0, p));
+  }
+  function update() {
+    const p = progress();
+    if (ready && dur) {
+      const t = p * (dur - 0.05);
+      if (Math.abs(introVideo.currentTime - t) > 0.01) {
+        try { introVideo.currentTime = t; } catch (e) {}
+      }
+    }
+    if (cue) cue.style.opacity = Math.max(0, 1 - p * 4).toFixed(2);
     ticking = false;
   }
   function onScroll() { if (!ticking) { requestAnimationFrame(update); ticking = true; } }

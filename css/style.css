@@ -359,7 +359,14 @@ footer.site {
 }
 
 /* ---------- Scroll-driven brand reveal ---------- */
-.brand-reveal { height: 160vh; position: relative; z-index: 1; }
+.brand-reveal { height: 200vh; position: relative; z-index: 1; }
+.brand-video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  background: #050507;
+}
+@media (max-width: 720px) { .brand-video { object-fit: contain; } }
 .brand-sticky {
   position: sticky; top: 0; height: 100vh;
   display: flex; flex-direction: column;
@@ -417,8 +424,7 @@ footer.site {
 @media (max-width: 720px) { .brand-reveal { height: 150vh; } .brand-tag { letter-spacing: 10px; } }
 @media (prefers-reduced-motion: reduce) {
   .brand-reveal { height: auto; }
-  .brand-sticky { height: auto; padding: 90px 0; }
-  .brand-logo-wrap { transform: none; filter: none; opacity: 1; }
-  .brand-tag { opacity: 1; letter-spacing: 10px; }
+  .brand-sticky { height: auto; padding: 0; }
+  .brand-video { position: static; width: 100%; height: auto; object-fit: contain; }
   .brand-scrollcue { display: none; }
 }
