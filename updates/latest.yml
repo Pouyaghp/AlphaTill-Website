@@ -1,8 +1,8 @@
-version: 0.1.0
+version: 0.1.1
 files:
-  - url: AlphaTill Setup 0.1.0.exe
-    sha512: MrOTCKZ54v/vXy1WzDmFUwd9qE7UuS3kx3vEz2TCoa8FpvZQpRmJksemMVOCIkjhM0m9798vgGhW31xAYlz8gw==
-    size: 86359271
-path: AlphaTill Setup 0.1.0.exe
-sha512: MrOTCKZ54v/vXy1WzDmFUwd9qE7UuS3kx3vEz2TCoa8FpvZQpRmJksemMVOCIkjhM0m9798vgGhW31xAYlz8gw==
-releaseDate: '2026-06-09T00:33:24.121Z'
+  - url: AlphaTill Setup 0.1.1.exe
+    sha512: 959QgZcHhGsLIBouE3JIO7in3TIRoqUEB9k+PasVIvHc7V4PU1XdfF4F/M5q5lIvG6ah8/V4m/iuTPcoVNS22A==
+    size: 86363568
+path: AlphaTill Setup 0.1.1.exe
+sha512: 959QgZcHhGsLIBouE3JIO7in3TIRoqUEB9k+PasVIvHc7V4PU1XdfF4F/M5q5lIvG6ah8/V4m/iuTPcoVNS22A==
+releaseDate: '2026-06-09T01:18:29.536Z'
